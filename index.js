@@ -131,7 +131,8 @@ const View = (() => {
     renderInventory,
     renderCart,
     inventoryEl,
-    checkoutEl
+    checkoutEl,
+    cartEl
   };
 })();
 
@@ -167,7 +168,15 @@ const Controller = ((model, view) => {
     }
   };
 
-  const handleEdit = () => {};
+  const handleEdit = (event) => {
+    const target = event.target;
+      if (target.classList.contains("edit-btn")) {
+      const itemId = target.getAttribute("data-id");
+  
+      // TO DO: implement edit
+      console.log(`Edit item with ID: ${itemId}`);
+    }
+  };
 
   const handleEditAmount = (event) => {
     const target = event.target;
@@ -188,18 +197,23 @@ const Controller = ((model, view) => {
 
   const handleDelete = (event) => {
     const target = event.target;
-
+  
     if (target.classList.contains("delete-btn")) {
       const itemId = target.getAttribute("data-id");
-  
+
       API.deleteFromCart(itemId).then(() => {
         console.log(`Deleted item with ID: ${itemId}`);
 
         const updatedCart = state.cart.filter(item => item.id !== itemId);
+
         state.cart = updatedCart;
+
+        console.log("Updated cart state:", state.cart);
+      }).catch((error) => {
+        console.error('Error deleting item from cart:', error);
       });
     }
-  };
+  };  
 
   const handleCheckout = () => {
     API.checkout().then(() => {
@@ -224,7 +238,10 @@ const Controller = ((model, view) => {
     View.inventoryEl.addEventListener("click", handleEditAmount);
     View.inventoryEl.addEventListener("click", handleAddToCart);
     View.checkoutEl.addEventListener("click", handleCheckout);
-    View.cartEl.addEventListener("click", handleDelete);
+    View.cartEl.addEventListener("click", (event) => {
+      handleDelete(event);
+      handleEdit(event);
+    });
   };
 
   return {
